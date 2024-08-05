@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "2. Add Two Numbers": {
+      "commandName": "Project",
+      "commandLineArgs": "divide"
+    }
+  }
+}
