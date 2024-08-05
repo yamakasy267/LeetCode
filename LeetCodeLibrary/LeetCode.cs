@@ -1,83 +1,51 @@
 ﻿namespace LeetCodeLibrary
 {
-    public class ListNode
+    public class LeetCode : ILeetCode
     {
-        public int val;
-        public ListNode next;
-        public ListNode(int val = 0, ListNode next = null)
-        {
-            this.val = val;
-            this.next = next;
-        }
-    }
-    public class TreeNode
-    {
-        public int val;
-        public TreeNode left;
-        public TreeNode right;
-        public TreeNode(int val = 0, TreeNode left = null, TreeNode right = null)
-        {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
-    }
-    public class LeetCode
-    {
-        
-        public ListNode AddTwoNumbers(ListNode l1, ListNode l2)
-        {
 
-            string number1 = "", number2 = "";
-            while (l1 is not null || l2 is not null)
+        public ListNode AddTwoNumbers(string[] mas1, string[] mas2)
+        {
+            var listNode1 = new ListNode(mas1);
+            var listNode2 = new ListNode(mas2);
+            string number1 = string.Empty;
+            string number2 = string.Empty;
+            while (listNode1 is not null || listNode2 is not null)
             {
-                if (l1 is not null && l2 is not null)
+                if (listNode1 is not null && listNode2 is not null)
                 {
-                    number1 += l1.val.ToString();
-                    number2 += l2.val.ToString();
-                    l1 = l1.next;
-                    l2 = l2.next;
+                    number1 += listNode1.val;
+                    number2 += listNode2.val;
+                    listNode1 = listNode1.next;
+                    listNode2 = listNode2.next;
                 }
-                else if (l1 is not null)
+                else if (listNode1 is not null)
                 {
-                    number1 += l1.val.ToString();
-                    l1 = l1.next;
+                    number1 += listNode1.val;
+                    listNode1 = listNode1.next;
                 }
                 else
                 {
-                    number2 += l2.val.ToString();
-                    l2 = l2.next;
+                    number2 += listNode2.val;
+                    listNode2 = listNode2.next;
                 }
             }
-            var res = (Int32.Parse(number1) + Int32.Parse(number2)).ToString();
-            ListNode node = new ListNode();
-            ListNode firstNode = node;
-            for (var i = res.Length - 1; i > -1; i--)
-            {
-                node.val = Int32.Parse(res[i].ToString());
-                if (i != 0)
-                {
-                    node.next = new ListNode();
-                    node = node.next;
-                }
-            }
-            return firstNode;
+            var res = (int.Parse(number1) + int.Parse(number2))
+                .ToString()
+                .Reverse()
+                .Select(c => c.ToString())
+                .ToArray();
+            return new ListNode(res);
         }
-        public static int Divide(int dividend, int divisor)
+        public int Divide(int dividend, int divisor)
         {
             if (divisor == dividend) return 1;
             if (divisor == 1) return dividend;
-
             if (divisor == -1)
             {
-                if (dividend == Int32.MinValue)
-                    return Int32.MaxValue;
-                else
-                    return -dividend;
+                return dividend == int.MinValue ? int.MaxValue : -dividend;
             }
 
             int result = 0;
-
             if (dividend > 0 && divisor > 0)
             {
                 while (dividend >= 0)
@@ -99,7 +67,7 @@
                 result--;
             }
             else if (dividend < 0 && divisor > 0)
-            { 
+            {
                 while (dividend <= 0)
                 {
                     if (Int32.MinValue + 1 == result) return Int32.MinValue;
@@ -109,7 +77,7 @@
                 result++;
             }
             else if (dividend > 0 && divisor < 0)
-            { 
+            {
                 while (dividend >= 0)
                 {
                     if (Int32.MinValue + 1 == result) return Int32.MinValue;
@@ -121,7 +89,7 @@
 
             return result;
         }
-        public static bool CanJump(int[] nums)
+        public bool CanJump(int[] nums)
         {
             int finishIndex = nums.Length - 1;
             for (int i = finishIndex; i >= 0; i--)
@@ -131,9 +99,9 @@
                     finishIndex = i;
                 }
             }
-            return finishIndex == 0 ? true : false;
+            return finishIndex == 0;
         }
-        public static int LengthOfLongestSubstring(string s)
+        public int LengthOfLongestSubstring(string s)
         {
             int size = s.Length;
             int right = 0;
@@ -157,22 +125,25 @@
             }
             return maxLength;
         }
-        public static void Rotate(int[] nums, int k)
+        public void Rotate(int[] nums, int k)
         {
             k = k % nums.Length;
             Array.Reverse(nums);
             Array.Reverse(nums, 0, k);
             Array.Reverse(nums, k, nums.Length - k);
         }
-        List<int> inorder = new List<int>();
-        public bool IsValidBST(TreeNode root)
+        public bool IsValidBST(int[] array)
         {
-            Inorder(root);
-
-            if (inorder.Count() == 0) return false;
+            TreeNode root = new TreeNode(array[0]);
+            for (int i = 1; i < array.Length; ++i)
+            {
+                root = InsertRec(root, array[i]);
+            }
+            List<int> inorder = Inorder(root);
+            if (inorder.Count == 0) return false;
 
             int prev = inorder[0];
-            for (int i = 1; i < inorder.Count(); i++)
+            for (int i = 1; i < inorder.Count; i++)
             {
                 if (prev < inorder[i])
                 {
@@ -183,49 +154,24 @@
             }
             return true;
         }
-        private void Inorder(TreeNode node)
+        private List<int> Inorder(TreeNode node)
         {
-            if (node == null) return;
-
-            if (node.left != null || node.right != null)
+            var result = new List<int>();
+            if (node == null) return result;
+            result.Add(node.val);
+            if (node.left != null)
             {
-                Inorder(node.left);
-                inorder.Add(node.val);
-                Inorder(node.right);
+                result.AddRange(Inorder(node.left));
             }
-            else
+            if (node.right != null)
             {
-                inorder.Add(node.val);
+                result.AddRange(Inorder(node.right));
             }
-
+            return result;
         }
-        public static ListNode Init(int[] mas)
+        private TreeNode InsertRec(TreeNode node, int value)
         {
-
-            var node = new ListNode(mas[^1]);
-            for (int i = mas.Length - 2; i >= 0; i--)
-            {
-                var nextNode = new ListNode(mas[i], node);
-                node = nextNode;
-            }
-            return node;
-        }
-        public static TreeNode InitTree(int[] nodes)
-        {
-            TreeNode tree = new TreeNode(nodes[0]);
-            for (int i = 1; i < nodes.Length; ++i)
-            {
-                tree = InsertRec(tree, nodes[i]);
-            }
-            return tree;
-        }
-        private static TreeNode InsertRec(TreeNode node, int value)
-        {
-            if (value == 0)
-            {
-                return node;
-            }
-
+            if (value == 0) return node;
             int comparison = Comparer<int>.Default.Compare(value, node.val);
             if (comparison < 0)
             {
